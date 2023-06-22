@@ -1,0 +1,59 @@
+pipeline {
+    agent any
+    environment {
+        PATH = "$PATH:/usr/share/maven/bin"
+    }
+    stages {
+        stage('git checkout') {
+            steps {
+                git branch: 'main', credentialsId: 'git', url: 'https://github.com/sssandeep9999/project2_9999.git'
+            }
+        }
+        stage('Maven') {
+            steps {
+                sh "mvn --version"
+            }
+        }
+        stage('Maven Build') {
+            steps {
+                sh "mvn clean install"
+            }
+        }
+        stage('SonarQube analysis') {
+            steps {
+            withSonarQubeEnv('Soner-Server-8.9.10') {
+            sh "mvn sonar:sonar"
+            }
+            }
+        }
+        stage('Artifact Upload') {
+            steps {
+                nexusArtifactUploader artifacts: [[artifactId: 'medilab-web-app', classifier: '', file: 'target/medilab-morning-preclinic-war-0.0.1-SNAPSHOT.war', type: 'war']], credentialsId: 'NEXUS-CREDENTIALS', groupId: 'SATYASAISANDEEPGROUPOFPROJECTS', nexusUrl: '13.232.161.44:8081', nexusVersion: 'nexus3', protocol: 'http', repository: 'SatyaSaiSandeep901-project-repo', version: '1.0-SNAPSHOT'
+            }
+        }
+        stage('Docker Build') {
+            steps {
+                sh 'docker --version'
+                sh 'sudo docker build -t satyasandeep901/medilabproject:1 .'
+            }
+        }
+        stage('Docker Push') {
+            steps {
+                withCredentials([string(credentialsId: 'dockerUP', variable: 'dockerUP')]) {
+                sh 'sudo docker login -u satyasandeep901 -p ${dockerUP}'
+}
+                sh 'sudo docker push satyasandeep901/medilabproject:1'
+            }
+          }
+        stage('Deployment') {
+            steps {
+                withCredentials([kubeconfigContent(credentialsId: 'kubernetes-credentials', variable: 'KUBECONFIG_CONTENT')]) {
+                sh 'kubectl create -f ingress-controller.yml'
+                sh 'kubectl create -f ingress.yml && kubectl create -f ingress2.yml && kubectl create -f ingress3.yml'
+                sh 'kubectl create -f 1ns&1ingress-multiple-deploy&service.yml && kubectl create -f deploy&svc2-login.yml && kubectl create -f deploy&svc3-medilab.yml'
+                sh 'kubectl get ns'
+                }
+            }
+        }
+    }
+}

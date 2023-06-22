@@ -1,0 +1,126 @@
+#one namespace with one ingress but multiple deployments on eks cluster
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy2-loginapp
+  namespace: demo-ingress
+spec:
+  selector:
+    matchLabels:
+      app: deploy2-loginapp
+  replicas: 1
+  template: # template for the pods
+    metadata:
+      labels:
+        app: deploy2-loginapp
+    spec:
+      containers:
+      - name: deploy2-loginapp
+        image: satyasandeep901/myloginimage31jul22:2
+        resources:
+          requests:
+              memory: 512Mi
+              cpu: 0.5
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: deploy2-loginapp-svc
+  namespace: demo-ingress
+spec:
+  selector:
+    app: deploy2-loginapp
+
+  ports:
+    - name: http
+      port: 8080
+
+  type: ClusterIP
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy3-loginapp
+  namespace: demo-ingress
+spec:
+  selector:
+    matchLabels:
+      app: deploy3-loginapp
+  replicas: 1
+  template: # template for the pods
+    metadata:
+      labels:
+        app: deploy3-loginapp
+    spec:
+      containers:
+      - name: deploy3-loginapp
+        image: satyasandeep901/loginappphotogenic:1
+        resources:
+          requests:
+              memory: 512Mi
+              cpu: 0.5
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: deploy3-loginapp-svc
+  namespace: demo-ingress
+
+spec:
+
+  selector:
+    app: deploy3-loginapp
+
+  ports:
+    - name: http
+      port: 8080
+
+  type: ClusterIP
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-application
+  namespace: demo-ingress
+spec:
+  selector:
+    matchLabels:
+      app: deploy-application
+  replicas: 1
+  template: # template for the pods
+    metadata:
+      labels:
+        app: deploy-application
+    spec:
+      containers:
+      - name: deploy-application
+        image: satyasandeep901/myloginimage31jul22:3
+        resources:
+          requests:
+              memory: 512Mi
+              cpu: 0.5
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: deploy-application-svc
+  namespace: demo-ingress
+
+spec:
+
+  selector:
+    app: deploy-application
+
+  ports:
+    - name: http
+      port: 8080
+
+  type: ClusterIP
+
+
+

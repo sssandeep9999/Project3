@@ -1,0 +1,14 @@
+pipeline {
+    agent any
+    stages {
+        stage('Testing kubeconfig') {
+            steps {
+                withCredentials([kubeconfigContent(credentialsId: 'kubernetes-credentials', variable: 'KUBECONFIG_CONTENT')]) {
+                sh 'kubectl get svc'
+                sh 'kubectl get nodes'
+                sh 'kubectl get pods -A'
+                }
+            }
+        }
+    }
+}

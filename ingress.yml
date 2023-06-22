@@ -1,0 +1,32 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: demo-nginx-ingress
+  namespace: demo-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: satyasaisandeep.shop
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: deploy-application-svc
+            port:
+              number: 80
+      - pathType: Prefix
+        path: "/sandeep"
+        backend:
+          service:
+            name: deploy2-loginapp-svc
+            port:
+              number: 8080
+      - pathType: Prefix
+        path: "/photognic "
+        backend:
+          service:
+            name: deploy3-loginapp-svc
+            port:
+              number: 8080
