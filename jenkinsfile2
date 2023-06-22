@@ -6,7 +6,7 @@ pipeline {
     stages {
         stage('git checkout') {
             steps {
-                git branch: 'main', credentialsId: 'git', url: 'https://github.com/sssandeep9999/project2_9999.git'
+                git branch: 'main', credentialsId: 'git', url: 'https://github.com/sssandeep9999/Project3.git'
             }
         }
         stage('Maven') {
